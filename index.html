@@ -25,6 +25,8 @@
 			transition: all 0.8s cubic-bezier(0.4, 0, 0.2, 1);
 			transform-origin: center;
 			box-sizing: border-box;
+			/* Hide until initialized to prevent flash */
+			visibility: hidden;
 		}
 		
 		.image-wrapper {
@@ -79,6 +81,60 @@
 	</div>
 	
 	<script>
+		// Set initial state before page renders
+		document.addEventListener('DOMContentLoaded', function() {
+			const width = window.innerWidth;
+			const verticalWidth = 800;
+			
+			// Check if we start in vertical mode
+			if (width <= verticalWidth) {
+				// Start in vertical mode - set initial styles immediately
+				const container = document.getElementById('container');
+				container.style.visibility = 'visible';
+				container.style.transform = 'rotate(90deg)';
+				container.style.padding = '2em';
+				container.style.gap = '2em';
+				
+				// Set all text to visible with padding
+				document.querySelectorAll('p').forEach(p => {
+					p.style.opacity = '1';
+					p.style.paddingRight = '2em';
+					p.style.fontSize = '0.85em';
+					p.style.transform = 'rotate(-90deg)';
+				});
+				
+				// Set images to counter-rotate
+				document.querySelectorAll('img').forEach(img => {
+					img.style.transform = 'rotate(-90deg)';
+				});
+				
+				// Set wrapper dimensions for vertical
+				document.querySelectorAll('.image-wrapper').forEach(wrapper => {
+					wrapper.style.width = '100%';
+					wrapper.style.height = '25%';
+					
+					const img = wrapper.querySelector('img');
+					if (img) {
+						img.style.maxHeight = '70%';
+					}
+					
+					const p = wrapper.querySelector('p');
+					if (p) {
+						p.style.marginTop = '1.5em';
+					}
+				});
+				
+				// Adjust container size
+				container.style.height = 'calc(100vh + 10%)';
+				container.style.width = 'calc(100vw + 10%)';
+				
+			} else {
+				// Start in horizontal mode
+				const container = document.getElementById('container');
+				container.style.visibility = 'visible';
+			}
+		});
+		
 		function handleResize() {
 			const container = document.getElementById('container');
 			const imageWrappers = document.querySelectorAll('.image-wrapper');
@@ -170,6 +226,17 @@
 			resizeTimeout = setTimeout(handleResize, 10);
 		});
 		
+		// Initialize after DOM is ready
+		document.addEventListener('DOMContentLoaded', function() {
+			// If we didn't already set vertical mode in the initial check, run handleResize
+			const width = window.innerWidth;
+			const verticalWidth = 800;
+			
+			if (width > verticalWidth) {
+				handleResize();
+			}
+		});
+		
 		document.querySelectorAll('img').forEach(img => {
 			img.addEventListener('mouseenter', function() {
 				const width = window.innerWidth;
@@ -209,8 +276,6 @@
 				}
 			});
 		});
-		
-		handleResize();
 	</script>
 </body>
 </html>
